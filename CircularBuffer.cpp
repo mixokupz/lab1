@@ -8,10 +8,7 @@ CircularBuffer::CircularBuffer(){
 }
 
 CircularBuffer::~CircularBuffer(){
-    delete(this->buffer);
-    this->cap =0;
-    this->tail =0;
-    this->head =0;
+    delete[] this->buffer;
 }
 CircularBuffer::CircularBuffer(const CircularBuffer & cb): buffer(new value_type[cb.cap]{}),cap(cb.cap){
     for(int i=0;i<cb.cap;i++){
@@ -51,8 +48,9 @@ const value_type & CircularBuffer::operator[](int i) const{
 //Доступ по индексу. Методы бросают исключение в случае неверного индекса.
 value_type & CircularBuffer::at(int i){
     if(i>=this->cap || i<0){
-        std::cout<<"Error: wrong position\nIt'll be shot down";
-        exit(0);
+        throw std::invalid_argument("Error: wrong position\n");
+        //std::cout<<"Error: wrong position\nIt'll be shot down";
+        //exit(0);
     }else{
         return this->buffer[i]; 
     }
@@ -60,7 +58,7 @@ value_type & CircularBuffer::at(int i){
 }
 const value_type & CircularBuffer::at(int i) const{
     if(i>=this->cap || i<0){
-        std::cout<<"Error: wrong position\nIt'll be shot down";
+        throw std::invalid_argument("Error: wrong position\n");
     }else{
         return this->buffer[i]; 
     }
@@ -244,7 +242,6 @@ void CircularBuffer::push_back(const value_type & item){
 }
     
 //Добавляет новый элемент перед первым элементом буфера. 
-//Аналогично push_back, может переписать последний элемент буфера.
 void CircularBuffer::push_front(const value_type & item){
     if(this->head>0){
         this->head -=1;
@@ -254,7 +251,7 @@ void CircularBuffer::push_front(const value_type & item){
         this->buffer[this->head] = item;
     }
 }
-//удаляет последний элемент буфера.
+//удаляет последний элемент буфера.тут надо подумать
 void CircularBuffer::pop_back(){
     if(!empty()){
         value_type *new_buf = new value_type[this->cap]{};
@@ -268,7 +265,7 @@ void CircularBuffer::pop_back(){
             this->tail -=1;
         }else{
             this->tail = this->cap -1;
-            for(int i =0;i<this->tail;i++){
+            for(int i =1;i<this->tail;i++){
                 new_buf[i] = this->buffer[i];
             }
         }
@@ -282,11 +279,14 @@ void CircularBuffer::pop_back(){
     
 }
     
-//удаляет первый элемент буфера.
+//удаляет первый элемент буфера.тут тоже подумать  
 void CircularBuffer::pop_front(){
     if(!empty()){
         value_type *new_buf = new value_type[this->cap]{};
-        if(this->head<this->cap){
+        if(this->head<this->cap-1){
+            for(int i =0; i<this->head;i++){
+                new_buf[i] = this->buffer[i];
+            }
             this->head +=1;
             for(int i =this->head; i<this->cap;i++){
                 new_buf[i] = this->buffer[i];
@@ -295,7 +295,7 @@ void CircularBuffer::pop_front(){
             for(int i =0; i<this->head;i++){
                 new_buf[i] = this->buffer[i];
             }
-            this->head +=0;
+            this->head = 0;
         }
         delete[] this->buffer;
         this->buffer = new_buf;

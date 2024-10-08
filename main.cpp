@@ -1,5 +1,6 @@
 #include <iostream>
 #include "CircularBuffer.h"
+#include <gtest/gtest.h>
 using namespace std;
 int main(int, char**){
     CircularBuffer first = CircularBuffer(6);
